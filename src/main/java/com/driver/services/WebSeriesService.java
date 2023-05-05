@@ -26,49 +26,36 @@ public class WebSeriesService {
         //use function written in Repository Layer for the same
         //Dont forget to save the production and webseries Repo
 
-        ProductionHouse productionHouse;
+        if (webSeriesRepository.findBySeriesName(webSeriesEntryDto.getSeriesName()) != null) {
+            throw new Exception("Series is already present");
+        }
 
-                    productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
-
-
-               String name=null;
-
-               name=webSeriesRepository.findBySeriesName(webSeriesEntryDto.getSeriesName()).getSeriesName();
-
-         if(name!=null)
-         {
-             throw new Exception("Series is already present");
-         }
-               WebSeries webSeries = new WebSeries();
-
-        webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
+        WebSeries webSeries = new WebSeries();
+        webSeries.setSeriesName(webSeries.getSeriesName());
         webSeries.setAgeLimit(webSeriesEntryDto.getAgeLimit());
         webSeries.setRating(webSeriesEntryDto.getRating());
         webSeries.setSubscriptionType(webSeriesEntryDto.getSubscriptionType());
+
+        ProductionHouse productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
         webSeries.setProductionHouse(productionHouse);
 
         productionHouse.getWebSeriesList().add(webSeries);
 
-        double updateRating = fixRating(productionHouse.getWebSeriesList());
+        //?Here we are calculating the production house ratings.
+        List<WebSeries> productionHouseWebSeries = webSeriesRepository.findByProductionHouse(productionHouse);
+        int totalRatings = 0;
+        int numberOfWebSeries = productionHouseWebSeries.size();
 
-        productionHouse.setRatings(updateRating);
-
-       WebSeries up = webSeriesRepository.save(webSeries);
-        productionHouseRepository.save(productionHouse);
-
-        return up.getId();
-    }
-
-    public double fixRating(List<WebSeries> list)
-    {
-        double count=0;
-
-        for(WebSeries webSeries : list)
-        {
-            count+=webSeries.getRating();
+        for (WebSeries series : productionHouseWebSeries) {
+            totalRatings += series.getRating();
         }
 
-        return count/list.size();
+        double updatedRating = (double) totalRatings / numberOfWebSeries;
+        productionHouse.setRatings(updatedRating);
+
+        productionHouseRepository.save(productionHouse);
+        WebSeries savedWebseries = webSeriesRepository.save(webSeries);
+        return savedWebseries.getId();
     }
 
 }
