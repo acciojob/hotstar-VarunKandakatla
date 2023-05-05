@@ -31,18 +31,19 @@ public class WebSeriesService {
                     productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
                 }catch (Exception e)
                 {
-                    throw new RuntimeException();
+                    return -1;
                 }
-     String name=null;
 
-                name = webSeriesRepository.findBySeriesName(webSeriesEntryDto.getSeriesName()).getSeriesName();
+                WebSeries webSeries=null;
 
-                if(name!=null)
+                webSeries = webSeriesRepository.findBySeriesName(webSeriesEntryDto.getSeriesName());
+
+                if(webSeries!=null)
                 {
                     throw new Exception("Series is already present");
                 }
 
-        WebSeries webSeries = new WebSeries();
+         webSeries = new WebSeries();
 
         webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
         webSeries.setAgeLimit(webSeriesEntryDto.getAgeLimit());
