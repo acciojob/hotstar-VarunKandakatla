@@ -26,8 +26,13 @@ public class WebSeriesService {
         //use function written in Repository Layer for the same
         //Dont forget to save the production and webseries Repo
 
-        ProductionHouse productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
-
+        ProductionHouse productionHouse;
+                try {
+                    productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
+                }catch (Exception e)
+                {
+                    throw new RuntimeException();
+                }
         for(WebSeries webSeries : productionHouse.getWebSeriesList())
         {
             if(webSeries.getSeriesName().equals(webSeriesEntryDto.getSeriesName()))

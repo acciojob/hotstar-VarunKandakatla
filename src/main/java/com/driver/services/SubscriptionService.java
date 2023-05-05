@@ -27,7 +27,14 @@ public class SubscriptionService {
         //Save The subscription Object into the Db and return the total Amount that user has to pay
 
         //Getting user and Setting his/her subscription
-        User user = userRepository.findById(subscriptionEntryDto.getUserId()).get();
+        User user;
+        try {
+            user  = userRepository.findById(subscriptionEntryDto.getUserId()).get();
+        }catch (Exception e)
+        {
+            throw new RuntimeException();
+        }
+
 
         Subscription subscription  = user.getSubscription();
 
@@ -49,7 +56,13 @@ public class SubscriptionService {
         //In all other cases just try to upgrade the subscription and tell the difference of price that user has to pay
         //update the subscription in the repository
 
-        User user = userRepository.findById(userId).get();
+        User user ;
+                try{
+                    user = userRepository.findById(userId).get();
+                } catch (Exception e)
+                {
+                    throw new RuntimeException();
+                }
 
         Subscription subscription = user.getSubscription();
 

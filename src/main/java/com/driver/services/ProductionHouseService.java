@@ -21,7 +21,7 @@ public class ProductionHouseService {
         {
             if(productionHouse.getName().equals(productionHouseEntryDto.getName()))
             {
-                return null;
+                return -1;
             }
         }
 
