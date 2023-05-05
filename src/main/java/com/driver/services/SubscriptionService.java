@@ -26,7 +26,21 @@ public class SubscriptionService {
 
         //Save The subscription Object into the Db and return the total Amount that user has to pay
 
-        return null;
+        //Getting user and Setting his/her subscription
+        User user = userRepository.findById(subscriptionEntryDto.getUserId()).get();
+
+        Subscription subscription  = user.getSubscription();
+
+        subscription.setStartSubscriptionDate(new Date());
+        subscription.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
+        subscription.setUser(user);
+        subscription.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
+        //Amount Setting
+        subscription.setTotalAmountPaid(Amount(subscriptionEntryDto.getSubscriptionType()));
+
+        userRepository.save(user);
+
+        return Amount(subscriptionEntryDto.getSubscriptionType());
     }
 
     public Integer upgradeSubscription(Integer userId)throws Exception{
@@ -35,7 +49,20 @@ public class SubscriptionService {
         //In all other cases just try to upgrade the subscription and tell the difference of price that user has to pay
         //update the subscription in the repository
 
-        return null;
+        User user = userRepository.findById(userId).get();
+
+        Subscription subscription = user.getSubscription();
+
+        if(subscription.getSubscriptionType().equals(SubscriptionType.ELITE))
+        {
+            throw new Exception ("Already the best Subscription");
+        }
+
+        Subscription newSubscription = updatedSubscription(subscription);
+
+        subscriptionRepository.save(newSubscription);
+
+        return Amount(newSubscription.getSubscriptionType()) - Amount (subscription.getSubscriptionType());
     }
 
     public Integer calculateTotalRevenueOfHotstar(){
@@ -43,7 +70,40 @@ public class SubscriptionService {
         //We need to find out total Revenue of hotstar : from all the subscriptions combined
         //Hint is to use findAll function from the SubscriptionDb
 
-        return null;
+        Integer revenue=0;
+
+        for(Subscription subscription : subscriptionRepository.findAll())
+        {
+            revenue=revenue+subscription.getTotalAmountPaid();
+        }
+
+        return revenue;
+    }
+
+    public  int  Amount(SubscriptionType subscriptionType)
+    {
+        if(subscriptionType.equals(SubscriptionType.BASIC))
+        {
+            return 500;
+        }
+        else if(subscriptionType.equals(SubscriptionType.PRO))
+        {
+            return 800;
+        }
+
+        return 1000;
+    }
+
+    public Subscription updatedSubscription( Subscription subscription)
+    {
+        if(subscription.getSubscriptionType().equals(SubscriptionType.BASIC))
+        {
+            subscription.setSubscriptionType(SubscriptionType.PRO);
+            return subscription;
+        }
+
+        subscription.setSubscriptionType(SubscriptionType.ELITE);
+        return subscription;
     }
 
 }
