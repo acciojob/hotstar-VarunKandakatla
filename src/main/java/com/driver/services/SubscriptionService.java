@@ -36,18 +36,30 @@ public class SubscriptionService {
         }
 
 
-        Subscription subscription  = user.getSubscription();
-
+        Subscription subscription  = new Subscription();
         subscription.setStartSubscriptionDate(new Date());
         subscription.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
         subscription.setUser(user);
         subscription.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
         //Amount Setting
-        subscription.setTotalAmountPaid(Amount(subscriptionEntryDto.getSubscriptionType()));
+        int totalAmount = Amount(subscriptionEntryDto.getSubscriptionType());
+
+        if(totalAmount==500)
+        {
+            totalAmount=totalAmount+(200*subscription.getNoOfScreensSubscribed());
+        }
+        else if(totalAmount==800)
+        {
+            totalAmount=totalAmount+(250*subscription.getNoOfScreensSubscribed());
+        }
+        else {
+            totalAmount=totalAmount+(350*subscriptionEntryDto.getNoOfScreensRequired());
+        }
+        subscription.setTotalAmountPaid(totalAmount);
 
         userRepository.save(user);
 
-        return Amount(subscriptionEntryDto.getSubscriptionType());
+        return totalAmount;
     }
 
     public Integer upgradeSubscription(Integer userId)throws Exception{
@@ -73,9 +85,20 @@ public class SubscriptionService {
 
         Subscription newSubscription = updatedSubscription(subscription);
 
+        int totalAmount = Amount(newSubscription.getSubscriptionType());
+
+        if(totalAmount==800)
+        {
+            totalAmount=totalAmount+(250*newSubscription.getNoOfScreensSubscribed());
+        }
+        else {
+            totalAmount = totalAmount + (350 * newSubscription.getNoOfScreensSubscribed());
+        }
+
+        newSubscription.setTotalAmountPaid(totalAmount);
         subscriptionRepository.save(newSubscription);
 
-        return Amount(newSubscription.getSubscriptionType()) - Amount (subscription.getSubscriptionType());
+        return totalAmount-subscription.getTotalAmountPaid();
     }
 
     public Integer calculateTotalRevenueOfHotstar(){
