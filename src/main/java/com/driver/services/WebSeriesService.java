@@ -33,13 +33,14 @@ public class WebSeriesService {
                 {
                     throw new RuntimeException();
                 }
-        for(WebSeries webSeries : productionHouse.getWebSeriesList())
-        {
-            if(webSeries.getSeriesName().equals(webSeriesEntryDto.getSeriesName()))
-            {
-                throw new Exception("Series is already present");
-            }
-        }
+     String name=null;
+
+                name = webSeriesRepository.findBySeriesName(webSeriesEntryDto.getSeriesName()).getSeriesName();
+
+                if(name!=null)
+                {
+                    throw new Exception("Series is already present");
+                }
 
         WebSeries webSeries = new WebSeries();
 
