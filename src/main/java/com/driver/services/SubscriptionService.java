@@ -36,14 +36,7 @@ public class SubscriptionService {
         }
 
 
-        Subscription subscription= user.getSubscription();
-
-        if(subscription==null)
-        {
-            subscription=new Subscription();
-        }
-
-
+        Subscription subscription  = user.getSubscription();
 
         subscription.setStartSubscriptionDate(new Date());
         subscription.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
@@ -51,7 +44,6 @@ public class SubscriptionService {
         subscription.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
         //Amount Setting
         subscription.setTotalAmountPaid(Amount(subscriptionEntryDto.getSubscriptionType()));
-        user.setSubscription(subscription);
 
         userRepository.save(user);
 
